@@ -2229,7 +2229,8 @@ bool LoadBlockIndex(bool fAllowNew)
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 28);
         nStakeMinAge = 60 * 60 * 24; // test net min age is 1 day
         nCoinbaseMaturity = 60;
-        bnInitialHashTarget = CBigNum(~uint256(0) >> 29);
+        bnInitialHashTarget = CBigNum(~uint256(0) >> 20);
+        bnInitialProofOfStakeHashTarget = CBigNum(~uint256(0) >> 16);
         nModifierInterval = 60 * 20; // test net modifier interval is 20 minutes
     }
 
