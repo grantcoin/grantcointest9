@@ -39,11 +39,11 @@ static const int64 MAX_MONEY = 50000000000 * COIN;
 static const int64 MAX_MINT_PROOF_OF_WORK = 10000000000 * COIN;
 static const int64 MIN_TXOUT_AMOUNT = MIN_TX_FEE;
 inline bool MoneyRange(int64 nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
-static const int COINBASE_MATURITY_GRT = 500;
+static const int COINBASE_MATURITY_GRT = 100;
 // Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.
 static const int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
 static const int STAKE_TARGET_SPACING = 1.5 * 60; // 90-second block spacing 
-static const int STAKE_MIN_AGE = 60 * 60 * 24; // minimum age for coin age (24 hours)
+static const int STAKE_MIN_AGE = 60 * 60 * 6; // minimum age for coin age (6 hours)
 static const int STAKE_MAX_AGE = 60 * 60 * 24 * 90; // stake age of full weight
 
 #ifdef USE_UPNP
