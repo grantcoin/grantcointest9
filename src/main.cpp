@@ -2262,11 +2262,11 @@ bool LoadBlockIndex(bool fAllowNew)
             return false;
 
         // Genesis Block:
-        // CBlock(hash=0000000189326faec333, ver=1, hashPrevBlock=00000000000000000000, hashMerkleRoot=02ae8a89c0, nTime=1426153587, nBits=1d0fffff, nNonce=346449998, vtx=1, vchBlockSig=)
-        //   Coinbase(hash=02ae8a89c0, nTime=1426148439, ver=1, vin.size=1, vout.size=1, nLockTime=0)
+        // CBlock(hash=0000000807108c8bfd86, ver=1, hashPrevBlock=00000000000000000000, hashMerkleRoot=a0df25c457, nTime=1426803487, nBits=1d0fffff, nNonce=68956473, vtx=1, vchBlockSig=)
+        //   Coinbase(hash=a0df25c457, nTime=1426801523, ver=1, vin.size=1, vout.size=1, nLockTime=0)
         //     CTxIn(COutPoint(0000000000, -1), coinbase 04ffff001d020f274c57435352776972652032372d4645422d32303135204d6f7267616e205374616e6c6579205375727665792046696e6473205375737461696e61626c6520496e76657374696e6720506f6973656420666f722047726f777468)
         //     CTxOut(empty)
-        //   vMerkleTree: 02ae8a89c0
+        //   vMerkleTree: a0df25c457
 
         // Genesis block
         const char* pszTimestamp = "CSRwire 27-FEB-2015 Morgan Stanley Survey Finds Sustainable Investing Poised for Growth";
@@ -2283,7 +2283,7 @@ bool LoadBlockIndex(bool fAllowNew)
         block.nVersion = 1;
         block.nTime    = 1426803487;
         block.nBits    = bnProofOfWorkLimit.GetCompact();
-        block.nNonce   = 0;
+        block.nNonce   = 68956473;
 
         if (fTestNet)
         {
@@ -2291,31 +2291,7 @@ bool LoadBlockIndex(bool fAllowNew)
             block.nNonce   = 122894938;
         }
 
-        CBigNum bnTarget;
-        bnTarget.SetCompact(block.nBits);
-
-        while (block.GetHash() > bnTarget.getuint256())
-        {
-         if (block.nNonce % 1048576 == 0)
-             printf("n=%dM hash=%s\n", block.nNonce / 1048576,
-                 block.GetHash().ToString().c_str());
-         if (block.nNonce < 4294967295)
-             block.nNonce++;
-         else
-         {
-             block.nTime = GetAdjustedTime();
-             printf("block nTime new value=%d\n", block.nTime);
-             block.nNonce = 0;
-         }
-        }
-
-        printf("Grantcoin Found Genesis Block:\n");
-        printf("genesis hash=%s\n", block.GetHash().ToString().c_str());
-        printf("merkle root=%s\n", block.hashMerkleRoot.ToString().c_str());
-        printf("block nTime=%d\n", block.nTime);  // latest block.nTime from while loop
-        block.print();
-
-        printf("Grantcoin End Genesis Block\n");
+        // Removed code to mine genesis block.
 
         //// debug print
         printf("%s\n", block.GetHash().ToString().c_str());
