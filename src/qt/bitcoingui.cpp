@@ -72,7 +72,7 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     rpcConsole(0)
 {
     resize(850, 550);
-    setWindowTitle(tr("Grantcoin (Grantcoin) Wallet"));
+    setWindowTitle(tr("Grantcoin Wallet"));
 #ifndef Q_WS_MAC
     setWindowIcon(QIcon(":icons/grantcoin"));
 #else
