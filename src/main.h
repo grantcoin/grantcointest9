@@ -888,7 +888,6 @@ public:
     unsigned int nTime;
     unsigned int nBits;
     unsigned int nNonce;
-    int nHeight;
 
     // network and disk
     std::vector<CTransaction> vtx;
