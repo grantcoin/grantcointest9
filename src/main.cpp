@@ -828,30 +828,9 @@ uint256 WantedByOrphan(const CBlock* pblockOrphan)
     return pblockOrphan->hashPrevBlock;
 }
 
-int64 GetProofOfWorkReward(int nHeight)
+int64 GetProofOfWorkReward(unsigned int nBits)
 {
-    int64 nSubsidy = COIN;
-    if (nHeight == 1)
-        nSubsidy = 10000000000 * COIN;  // Grantcoin created for planned distribution
-    else if (nHeight < 50000)
-        nSubsidy = CENT;  // De minimus reward pre-launch and up to 2 weeks post-launch
-    else if (nHeight < 100000)
-        nSubsidy = 400 * COIN;  // Public mining begins
-    else if (nHeight < 150000)
-        nSubsidy = 200 * COIN;
-    else if (nHeight < 200000)
-        nSubsidy = 100 * COIN;
-    else if (nHeight < 250000)
-        nSubsidy = 50 * COIN;
-    else if (nHeight < 300000)
-        nSubsidy = 25 * COIN;
-    else if (nHeight >= 300000)
-        nSubsidy = CENT;  // Reward phased out to de minimus value
-
-    // if (fDebug && GetBoolArg("-printcreation"))
-    //     printf("GetProofOfWorkReward() : create=%s nBits=0x%08x nSubsidy=%"PRI64d"\n", FormatMoney(nSubsidy).c_str(), nBits, nSubsidy);
-
-    return nSubsidy;
+    return INITIAL_DISTRIBUTION / PROOF_OF_WORK_BLOCKS;
 }
 
 // grantcoin: miner's coin stake is rewarded based on coin age spent (coin-days)
@@ -1929,6 +1908,18 @@ bool CBlock::AcceptBlock()
         return DoS(10, error("AcceptBlock() : prev block not found"));
     CBlockIndex* pindexPrev = (*mi).second;
     int nHeight = pindexPrev->nHeight+1;
+
+    // Check switch from proof-of-work to proof-of-stake
+    if (nHeight <= PROOF_OF_WORK_BLOCKS)
+    {
+        if (IsProofOfStake())
+            return DoS(100, error("AcceptBlock() : Proof-of-stake before switch"));
+    }
+    else
+    {
+        if (IsProofOfWork())
+            return DoS(100, error("AcceptBlock() : Proof-of-work after switch"));
+    }
 
     // Check proof-of-work or proof-of-stake
     if (nBits != GetNextTargetRequired(pindexPrev, IsProofOfStake()))
@@ -3639,6 +3630,12 @@ CBlock* CreateNewBlock(CReserveKey& reservekey, CWallet* pwallet, bool fProofOfS
     // Create new block
     auto_ptr<CBlock> pblock(new CBlock());
     if (!pblock.get())
+        return NULL;
+
+    // Allow only PoW blocks until limit, after that only PoS blocks
+    if (fProofOfStake && nBestHeight < PROOF_OF_WORK_BLOCKS)
+        return NULL;
+    if (!fProofOfStake && nBestHeight >= PROOF_OF_WORK_BLOCKS)
         return NULL;
 
     // Create coinbase tx
