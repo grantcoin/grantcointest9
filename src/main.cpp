@@ -1399,12 +1399,6 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex)
         mapQueuedChanges[tx.GetHash()] = CTxIndex(posThisTx, tx.vout.size());
     }
 
-    // Check coinbase reward
-    if (vtx[0].GetValueOut() > (IsProofOfWork()? (GetProofOfWorkReward(pindex->nBits) - vtx[0].GetMinFee() + MIN_TX_FEE) : 0))
-        return DoS(50, error("CheckBlock() : coinbase reward exceeded %s > %s", 
-                   FormatMoney(vtx[0].GetValueOut()).c_str(),
-                   FormatMoney(IsProofOfWork()? GetProofOfWorkReward(pindex->nBits) : 0).c_str()));
-
     // grantcoin: track money supply and mint amount info
     pindex->nMint = nValueOut - nValueIn + nFees;
     pindex->nMoneySupply = (pindex->pprev? pindex->pprev->nMoneySupply : 0) + nValueOut - nValueIn;
@@ -1855,6 +1849,12 @@ bool CBlock::CheckBlock() const
     // Check coinstake timestamp
     if (IsProofOfStake() && !CheckCoinStakeTimestamp(GetBlockTime(), (int64)vtx[1].nTime))
         return DoS(50, error("CheckBlock() : coinstake timestamp violation nTimeBlock=%u nTimeTx=%u", GetBlockTime(), vtx[1].nTime));
+
+    // Check coinbase reward
+    if (vtx[0].GetValueOut() > (IsProofOfWork()? (GetProofOfWorkReward(nBits) - vtx[0].GetMinFee() + MIN_TX_FEE) : 0))
+        return DoS(50, error("CheckBlock() : coinbase reward exceeded %s > %s", 
+                   FormatMoney(vtx[0].GetValueOut()).c_str(),
+                   FormatMoney(IsProofOfWork()? GetProofOfWorkReward(nBits) : 0).c_str()));
 
     // Check transactions
     BOOST_FOREACH(const CTransaction& tx, vtx)
