@@ -324,7 +324,7 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock& blockFrom, unsigned 
     CBigNum bnTargetPerCoinDay;
     bnTargetPerCoinDay.SetCompact(nBits);
     int64 nValueIn = txPrev.vout[prevout.n].nValue;
-    // v0.3 protocol kernel hash weight starts from 0 at the 30-day min age
+    // v0.3 protocol kernel hash weight starts from 0 at the min age for staking
     // this change increases active coins participating the hash and helps
     // to secure the network when proof-of-stake difficulty is low
     int64 nTimeWeight = min((int64)nTimeTx - txPrev.nTime, (int64)STAKE_MAX_AGE) - (IsProtocolV03(nTimeTx)? nStakeMinAge : 0);
