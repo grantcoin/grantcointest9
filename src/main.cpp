@@ -1400,10 +1400,10 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex)
     }
 
     // Check coinbase reward
-    if (vtx[0].GetValueOut() > (IsProofOfWork()? (GetProofOfWorkReward(pindex->nHeight) - vtx[0].GetMinFee() + MIN_TX_FEE) : 0))
+    if (vtx[0].GetValueOut() > (IsProofOfWork()? (GetProofOfWorkReward(pindex->nBits) - vtx[0].GetMinFee() + MIN_TX_FEE) : 0))
         return DoS(50, error("CheckBlock() : coinbase reward exceeded %s > %s", 
                    FormatMoney(vtx[0].GetValueOut()).c_str(),
-                   FormatMoney(IsProofOfWork()? GetProofOfWorkReward(pindex->nHeight) : 0).c_str()));
+                   FormatMoney(IsProofOfWork()? GetProofOfWorkReward(pindex->nBits) : 0).c_str()));
 
     // grantcoin: track money supply and mint amount info
     pindex->nMint = nValueOut - nValueIn + nFees;
@@ -3819,7 +3819,7 @@ CBlock* CreateNewBlock(CReserveKey& reservekey, CWallet* pwallet, bool fProofOfS
 
     }
     if (pblock->IsProofOfWork())
-        pblock->vtx[0].vout[0].nValue = GetProofOfWorkReward(pindexPrev->nHeight+1);
+        pblock->vtx[0].vout[0].nValue = GetProofOfWorkReward(pblock->nBits);
 
     // Fill in header
     pblock->hashPrevBlock  = pindexPrev->GetBlockHash();
