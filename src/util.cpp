@@ -64,7 +64,7 @@ using namespace boost;
 
 map<string, string> mapArgs;
 map<string, vector<string> > mapMultiArgs;
-bool fDebug = true;
+bool fDebug = false;
 bool fPrintToConsole = false;
 bool fPrintToDebugger = false;
 bool fRequestShutdown = false;
