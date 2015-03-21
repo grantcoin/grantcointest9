@@ -68,7 +68,7 @@ namespace Checkpoints
         return NULL;
     }
 
-    // grantcoin: synchronized checkpoint (centrally broadcasted)
+    // peercoin: synchronized checkpoint (centrally broadcasted)
     uint256 hashSyncCheckpoint = 0;
     uint256 hashPendingCheckpoint = 0;
     CSyncCheckpoint checkpointMessage;
@@ -76,7 +76,7 @@ namespace Checkpoints
     uint256 hashInvalidCheckpoint = 0;
     CCriticalSection cs_hashSyncCheckpoint;
 
-    // grantcoin: get last synchronized checkpoint
+    // peercoin: get last synchronized checkpoint
     CBlockIndex* GetLastSyncCheckpoint()
     {
         LOCK(cs_hashSyncCheckpoint);
@@ -87,7 +87,7 @@ namespace Checkpoints
         return NULL;
     }
 
-    // grantcoin: only descendant of current sync-checkpoint is allowed
+    // peercoin: only descendant of current sync-checkpoint is allowed
     bool ValidateSyncCheckpoint(uint256 hashCheckpoint)
     {
         if (!mapBlockIndex.count(hashSyncCheckpoint))
@@ -246,7 +246,7 @@ namespace Checkpoints
         return false;
     }
 
-    // grantcoin: reset synchronized checkpoint to last hardened checkpoint
+    // peercoin: reset synchronized checkpoint to last hardened checkpoint
     bool ResetSyncCheckpoint()
     {
         LOCK(cs_hashSyncCheckpoint);
@@ -368,12 +368,12 @@ namespace Checkpoints
     }
 }
 
-// grantcoin: sync-checkpoint master key
+// peercoin: sync-checkpoint master key
 const std::string CSyncCheckpoint::strMasterPubKey = "04c0c707c28533fd5c9f79d2d3a2d80dff259ad8f915241cd14608fb9bc07c74830efe8438f2b272a866b4af5e0c2cc2a9909972aefbd976937e39f46bb38c277c";
 
 std::string CSyncCheckpoint::strMasterPrivKey = "";
 
-// grantcoin: verify signature of sync-checkpoint message
+// peercoin: verify signature of sync-checkpoint message
 bool CSyncCheckpoint::CheckSignature()
 {
     CKey key;
@@ -388,7 +388,7 @@ bool CSyncCheckpoint::CheckSignature()
     return true;
 }
 
-// grantcoin: process synchronized checkpoint
+// peercoin: process synchronized checkpoint
 bool CSyncCheckpoint::ProcessSyncCheckpoint(CNode* pfrom)
 {
     if (!CheckSignature())
