@@ -35,7 +35,7 @@ set<pair<COutPoint, unsigned int> > setStakeSeen;
 uint256 hashGenesisBlock = hashGenesisBlockOfficial;
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 28);  // Reduced initial difficulty from Peercoin's 32
 static CBigNum bnInitialHashTarget(~uint256(0) >> 28);  // Reduced from Peercoin's 40
-static CBigNum bnInitialProofOfStakeHashTarget(~uint256(0) >> 16); // Added extra low initial difficulty for PoS
+static CBigNum bnInitialProofOfStakeHashTarget(~uint256(0) >> 20); // Lower initial difficulty for PoS
 unsigned int nStakeMinAge = STAKE_MIN_AGE;
 int nCoinbaseMaturity = COINBASE_MATURITY_GRT;
 CBlockIndex* pindexGenesisBlock = NULL;
@@ -2231,7 +2231,7 @@ bool LoadBlockIndex(bool fAllowNew)
     {
         hashGenesisBlock = hashGenesisBlockTestNet;
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 28);
-        nStakeMinAge = 60 * 60 * 24; // test net min age is 1 day
+        nStakeMinAge = 60 * 60; // test net min age is 1 hour
         nCoinbaseMaturity = 60;
         bnInitialHashTarget = CBigNum(~uint256(0) >> 20);
         bnInitialProofOfStakeHashTarget = CBigNum(~uint256(0) >> 16);
