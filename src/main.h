@@ -45,7 +45,7 @@ static const int STAKE_TARGET_SPACING = 1.5 * 60; // 90-second block spacing
 static const int STAKE_MIN_AGE = 60 * 60 * 12; // minimum age for coin age (12 hours)
 static const int STAKE_MAX_AGE = 60 * 60 * 24 * 90; // stake age of full weight
 static const int64 INITIAL_DISTRIBUTION = 10000000000 * COIN; // 10 billion GRT created for initial distribution
-static const int64 PROOF_OF_WORK_BLOCKS = 500; // total number of PoW blocks
+static const int64 PROOF_OF_WORK_BLOCKS = 1000; // total number of PoW blocks
 
 #ifdef USE_UPNP
 static const int fHaveUPnP = true;
