@@ -2267,7 +2267,7 @@ bool LoadBlockIndex(bool fAllowNew)
         // Genesis block
         const char* pszTimestamp = "CSRwire 27-FEB-2015 Morgan Stanley Survey Finds Sustainable Investing Poised for Growth";
         CTransaction txNew;
-        txNew.nTime = 1426883982;
+        txNew.nTime = 1426883984;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
         txNew.vin[0].scriptSig = CScript() << 486604799 << CBigNum(9999) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
@@ -2277,9 +2277,9 @@ bool LoadBlockIndex(bool fAllowNew)
         block.hashPrevBlock = 0;
         block.hashMerkleRoot = block.BuildMerkleTree();
         block.nVersion = 1;
-        block.nTime    = 1426888773;
+        block.nTime    = 1426888776;
         block.nBits    = bnProofOfWorkLimit.GetCompact();
-        block.nNonce   = 145521315;
+        block.nNonce   = 0;
 
         if (fTestNet)
         {
