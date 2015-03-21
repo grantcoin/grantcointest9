@@ -1435,7 +1435,7 @@ void ThreadMessageHandler2(void* parg)
     }
 }
 
-// grantcoin: stake minter thread
+// peercoin: stake minter thread
 void static ThreadStakeMinter(void* parg)
 {
     printf("ThreadStakeMinter started\n");
@@ -1670,7 +1670,7 @@ void StartNode(void* parg)
     // Generate coins in the background
     GenerateBitcoins(GetBoolArg("-gen", false), pwalletMain);
 
-    // grantcoin: mint proof-of-stake blocks in the background
+    // peercoin: mint proof-of-stake blocks in the background
     if (!CreateThread(ThreadStakeMinter, pwalletMain))
         printf("Error: CreateThread(ThreadStakeMinter) failed\n");
 }
