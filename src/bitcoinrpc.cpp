@@ -400,7 +400,7 @@ Value gethashespersec(const Array& params, bool fHelp)
 }
 
 
-// grantcoin: get network Gh/s estimate
+// peercoin: get network Gh/s estimate
 Value getnetworkghps(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
@@ -1740,7 +1740,7 @@ Value walletpassphrase(const Array& params, bool fHelp)
     int64* pnSleepTime = new int64(params[1].get_int64());
     CreateThread(ThreadCleanWalletPassphrase, pnSleepTime);
 
-    // grantcoin: if user OS account compromised prevent trivial sendmoney commands
+    // peercoin: if user OS account compromised prevent trivial sendmoney commands
     if (params.size() > 2)
         fWalletUnlockMintOnly = params[2].get_bool();
     else
@@ -2225,7 +2225,7 @@ Value getblock(const Array& params, bool fHelp)
 }
 
 
-// grantcoin: get information of sync-checkpoint
+// peercoin: get information of sync-checkpoint
 Value getcheckpoint(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
@@ -2247,7 +2247,7 @@ Value getcheckpoint(const Array& params, bool fHelp)
 }
 
 
-// grantcoin: reserve balance from being staked for network protection
+// peercoin: reserve balance from being staked for network protection
 Value reservebalance(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 2)
@@ -2289,7 +2289,7 @@ Value reservebalance(const Array& params, bool fHelp)
 }
 
 
-// grantcoin: check wallet integrity
+// peercoin: check wallet integrity
 Value checkwallet(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 0)
@@ -2312,7 +2312,7 @@ Value checkwallet(const Array& params, bool fHelp)
 }
 
 
-// grantcoin: repair wallet
+// peercoin: repair wallet
 Value repairwallet(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 0)
@@ -2334,7 +2334,7 @@ Value repairwallet(const Array& params, bool fHelp)
     return result;
 }
 
-// grantcoin: make a public-private key pair
+// peercoin: make a public-private key pair
 Value makekeypair(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
@@ -2368,7 +2368,7 @@ Value makekeypair(const Array& params, bool fHelp)
 extern CCriticalSection cs_mapAlerts;
 extern map<uint256, CAlert> mapAlerts;
 
-// grantcoin: send alert.  
+// peercoin: send alert.  
 // There is a known deadlock situation with ThreadMessageHandler
 // ThreadMessageHandler: holds cs_vSend and acquiring cs_main in SendMessages()
 // ThreadRPCServer: holds cs_main and acquiring cs_vSend in alert.RelayTo()/PushMessage()/BeginMessage()
