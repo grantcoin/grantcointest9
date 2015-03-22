@@ -33,9 +33,8 @@ unsigned int nTransactionsUpdated = 0;
 map<uint256, CBlockIndex*> mapBlockIndex;
 set<pair<COutPoint, unsigned int> > setStakeSeen;
 uint256 hashGenesisBlock = hashGenesisBlockOfficial;
-static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20);  // Reduced initial difficulty from Peercoin's 32
+static CBigNum bnProofOfWorkLimit(~uint256(0) >> 26);  // Reduced initial difficulty from Peercoin's 32
 static CBigNum bnInitialHashTarget(~uint256(0) >> 26);  // Reduced from Peercoin's 40
-static CBigNum bnInitialProofOfStakeHashTarget(~uint256(0) >> 24); // Lower initial difficulty for PoS
 unsigned int nStakeMinAge = STAKE_MIN_AGE;
 int nCoinbaseMaturity = COINBASE_MATURITY_GRT;
 CBlockIndex* pindexGenesisBlock = NULL;
@@ -828,9 +827,30 @@ uint256 WantedByOrphan(const CBlock* pblockOrphan)
     return pblockOrphan->hashPrevBlock;
 }
 
-int64 GetProofOfWorkReward(unsigned int nBits)
+int64 GetProofOfWorkReward(int nHeight)
 {
-    return INITIAL_DISTRIBUTION / PROOF_OF_WORK_BLOCKS;
+    int64 nSubsidy = COIN;
+    if (nHeight == 1)
+        nSubsidy = 10000000000 * COIN;  // Grantcoin created for planned distribution
+    else if (nHeight < 50000)
+        nSubsidy = CENT;  // De minimus reward pre-launch and up to 2 weeks post-launch
+    else if (nHeight < 100000)
+        nSubsidy = 400 * COIN;  // Public mining begins
+    else if (nHeight < 150000)
+        nSubsidy = 200 * COIN;
+    else if (nHeight < 200000)
+        nSubsidy = 100 * COIN;
+    else if (nHeight < 250000)
+        nSubsidy = 50 * COIN;
+    else if (nHeight < 300000)
+        nSubsidy = 25 * COIN;
+    else if (nHeight >= 300000)
+        nSubsidy = CENT;  // Reward phased out to de minimus value
+
+    // if (fDebug && GetBoolArg("-printcreation"))
+    //     printf("GetProofOfWorkReward() : create=%s nBits=0x%08x nSubsidy=%"PRI64d"\n", FormatMoney(nSubsidy).c_str(), nBits, nSubsidy);
+
+    return nSubsidy;
 }
 
 // grantcoin: miner's coin stake is rewarded based on coin age spent (coin-days)
@@ -874,14 +894,6 @@ const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfSta
     return pindex;
 }
 
-unsigned int static GetInitialTarget(bool fProofOfStake)
-{
-    if (fProofOfStake)
-        return bnInitialProofOfStakeHashTarget.GetCompact();
-    else
-        return bnInitialHashTarget.GetCompact();
-}
-
 unsigned int static GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake)
 {
     if (pindexLast == NULL)
@@ -889,10 +901,10 @@ unsigned int static GetNextTargetRequired(const CBlockIndex* pindexLast, bool fP
 
     const CBlockIndex* pindexPrev = GetLastBlockIndex(pindexLast, fProofOfStake);
     if (pindexPrev->pprev == NULL)
-        return GetInitialTarget(fProofOfStake); // first block
+        return bnInitialHashTarget.GetCompact(); // first block
     const CBlockIndex* pindexPrevPrev = GetLastBlockIndex(pindexPrev->pprev, fProofOfStake);
     if (pindexPrevPrev->pprev == NULL)
-        return GetInitialTarget(fProofOfStake); // second block
+        return bnInitialHashTarget.GetCompact(); // second block
 
     int64 nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
 
@@ -1398,6 +1410,12 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex)
 
         mapQueuedChanges[tx.GetHash()] = CTxIndex(posThisTx, tx.vout.size());
     }
+
+    // Check coinbase reward
+    if (vtx[0].GetValueOut() > (IsProofOfWork()? (GetProofOfWorkReward(pindex->nHeight) - vtx[0].GetMinFee() + MIN_TX_FEE) : 0))
+        return DoS(50, error("CheckBlock() : coinbase reward exceeded %s > %s", 
+                   FormatMoney(vtx[0].GetValueOut()).c_str(),
+                   FormatMoney(IsProofOfWork()? GetProofOfWorkReward(pindex->nHeight) : 0).c_str()));
 
     // grantcoin: track money supply and mint amount info
     pindex->nMint = nValueOut - nValueIn + nFees;
@@ -1909,18 +1927,6 @@ bool CBlock::AcceptBlock()
     CBlockIndex* pindexPrev = (*mi).second;
     int nHeight = pindexPrev->nHeight+1;
 
-    // Check switch from proof-of-work to proof-of-stake
-    if (nHeight <= PROOF_OF_WORK_BLOCKS)
-    {
-        if (IsProofOfStake())
-            return DoS(100, error("AcceptBlock() : Proof-of-stake before switch"));
-    }
-    else
-    {
-        if (IsProofOfWork())
-            return DoS(100, error("AcceptBlock() : Proof-of-work after switch"));
-    }
-
     // Check proof-of-work or proof-of-stake
     if (nBits != GetNextTargetRequired(pindexPrev, IsProofOfStake()))
         return DoS(100, error("AcceptBlock() : incorrect proof-of-work/proof-of-stake"));
@@ -2234,7 +2240,6 @@ bool LoadBlockIndex(bool fAllowNew)
         nStakeMinAge = 60 * 60; // test net min age is 1 hour
         nCoinbaseMaturity = 60;
         bnInitialHashTarget = CBigNum(~uint256(0) >> 20);
-        bnInitialProofOfStakeHashTarget = CBigNum(~uint256(0) >> 20);
         nModifierInterval = 60 * 20; // test net modifier interval is 20 minutes
     }
 
@@ -3638,12 +3643,6 @@ CBlock* CreateNewBlock(CReserveKey& reservekey, CWallet* pwallet, bool fProofOfS
     if (!pblock.get())
         return NULL;
 
-    // Allow only PoW blocks until limit, after that only PoS blocks
-    if (fProofOfStake && nBestHeight < PROOF_OF_WORK_BLOCKS)
-        return NULL;
-    if (!fProofOfStake && nBestHeight >= PROOF_OF_WORK_BLOCKS)
-        return NULL;
-
     // Create coinbase tx
     CTransaction txNew;
     txNew.vin.resize(1);
@@ -3825,7 +3824,7 @@ CBlock* CreateNewBlock(CReserveKey& reservekey, CWallet* pwallet, bool fProofOfS
 
     }
     if (pblock->IsProofOfWork())
-        pblock->vtx[0].vout[0].nValue = GetProofOfWorkReward(pblock->nBits);
+        pblock->vtx[0].vout[0].nValue = GetProofOfWorkReward(pindexPrev->nHeight+1);
 
     // Fill in header
     pblock->hashPrevBlock  = pindexPrev->GetBlockHash();
