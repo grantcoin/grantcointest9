@@ -44,8 +44,6 @@ static const int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
 static const int STAKE_TARGET_SPACING = 1.5 * 60; // 90-second block spacing 
 static const int STAKE_MIN_AGE = 60 * 30; // minimum age for coin age (30 minutes)
 static const int STAKE_MAX_AGE = 60 * 60 * 24 * 90; // stake age of full weight
-static const int64 INITIAL_DISTRIBUTION = 10000000000 * COIN; // 10 billion GRT created for initial distribution
-static const int64 PROOF_OF_WORK_BLOCKS = 100; // total number of PoW blocks
 
 #ifdef USE_UPNP
 static const int fHaveUPnP = true;
@@ -116,7 +114,7 @@ void IncrementExtraNonce(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& 
 void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata, char* phash1);
 bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey);
 bool CheckProofOfWork(uint256 hash, unsigned int nBits);
-int64 GetProofOfWorkReward(unsigned int nBits);
+int64 GetProofOfWorkReward(int nHeight);
 int64 GetProofOfStakeReward(int64 nCoinAge);
 unsigned int ComputeMinWork(unsigned int nBase, int64 nTime);
 int GetNumBlocksOfPeers();
@@ -888,6 +886,7 @@ public:
     unsigned int nTime;
     unsigned int nBits;
     unsigned int nNonce;
+    int nHeight;
 
     // network and disk
     std::vector<CTransaction> vtx;
