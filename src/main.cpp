@@ -33,7 +33,7 @@ unsigned int nTransactionsUpdated = 0;
 map<uint256, CBlockIndex*> mapBlockIndex;
 set<pair<COutPoint, unsigned int> > setStakeSeen;
 uint256 hashGenesisBlock = hashGenesisBlockOfficial;
-static CBigNum bnProofOfWorkLimit(~uint256(0) >> 26);  // Reduced initial difficulty from Peercoin's 32
+static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20);  // Reduced initial difficulty from Peercoin's 32
 static CBigNum bnInitialHashTarget(~uint256(0) >> 26);  // Reduced from Peercoin's 40
 unsigned int nStakeMinAge = STAKE_MIN_AGE;
 int nCoinbaseMaturity = COINBASE_MATURITY_GRT;
