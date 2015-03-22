@@ -24,7 +24,7 @@ unsigned int nProtocolV04TestSwitchTime = 1395700000;
 unsigned int nProtocolV04UpgradeTime    = 0;
 
 // Modifier interval: time to elapse before new modifier is computed
-// Set to 6-hour for production network and 20-minute for test network
+// Set to 1-hour for production network and 20-minute for test network
 unsigned int nModifierInterval = MODIFIER_INTERVAL;
 
 // Hard checkpoints of stake modifiers to ensure they are deterministic
